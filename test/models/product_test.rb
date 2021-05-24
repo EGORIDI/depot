@@ -72,5 +72,44 @@ class ProductTest < ActiveSupport::TestCase
     assert_equal [I18n.translate('error.message.taken')], 
                   product.errors[:title]
   end
+
+  test "product should have a title greater than 10 and smaller than 100 characters" do
+
+    def generate_title(size)
+      array_of_elements = []
+      for i in 1..size
+        array_of_elements << rand(1...10)
+      end
+      generated_title = array_of_elements.join.to_s
+      return generated_title
+    end
+    product = Product.new(title: generate_title(9),
+                          description: "yyy",
+                          price: 1,
+                          image_url: "fred.gif")
+    assert product.invalid?
+    assert_equal ["has less than 10 characters"], product.errors[:title]
+
+    product = Product.new(title: generate_title(10),
+                          description: "yyy",
+                          price: 1,
+                          image_url: "fred.gif")
+    assert product.valid?
+    assert_equal ["hasn't 10 characters"], product.errors[:title]
+
+    product = Product.new(title:  generate_title(101),
+                          description: "yyy",
+                          price: 1,
+                          image_url: "fred.gif")
+    assert product.invalid?
+    assert_equal ["has more than 100 characters"], product.errors[:title]
+
+    product = Product.new(title:  generate_title(100),
+                          description: "yyy",
+                          price: 1,
+                          image_url: "fred.gif")
+    assert product.valid?
+    assert_equal ["hasn't 100 characters"], product.errors[:title]
+  end
 end
 
